@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 基础色板 */
+    --white-rgb: 245, 245, 245;
+    --black-rgb: 0, 0, 0;
+    --purple-rgb: 115, 112, 178;
+    
+    /* 灰度系统 */
+    --gray-100-rgb: 240, 240, 240;
+    --gray-200-rgb: 229, 229, 229;
+    --gray-800-rgb: 38, 38, 38;
+    --gray-900-rgb: 23, 23, 23;
+
+    /* 语义化颜色 */
+    --background-base-rgb: var(--white-rgb);
+    --background-card-rgb: var(--gray-100-rgb);
+    --text-primary-rgb: var(--black-rgb);
+    --text-secondary-rgb: var(--gray-900-rgb);
+    --border-rgb: var(--gray-200-rgb);
+    --border-alpha: 0.1;
+
+    /* 字体系统 */
+    --font-xs: 0.75rem;    /* 12px */
+    --font-sm: 1rem;        /* 16px */
+    --font-base: 1.125rem;  /* 18px */
+    --font-lg: 1.25rem;     /* 20px */
+    --font-xl: 1.5rem;      /* 24px */
+    --font-2xl: 1.875rem;   /* 30px */
+    --font-3xl: 2.25rem;    /* 36px */
+    --font-4xl: 3rem;       /* 48px */
+    --font-5xl: 3.75rem;    /* 60px */
+
+    /* 阴影系统 */
+    --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-card: inset 0 0 6px rgba(0, 0, 0, 0.02),
+                  inset 0 0 6px rgba(0, 0, 0, 0.03),
+                  0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-hover: inset 0 0 8px rgba(0, 0, 0, 0.03),
+                   inset 0 0 6px rgba(0, 0, 0, 0.04),
+                   0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  html, body {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 滚动支持 */
+    overscroll-behavior-y: contain; /* 防止页面反弹 */
+  }
+
+  body {
+    background: rgb(var(--background-base-rgb));
+    color: rgb(var(--text-primary-rgb));
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: var(--font-base);
+    line-height: 1.5;
+    letter-spacing: -0.02em;
+    -webkit-font-smoothing: antialiased;
+    touch-action: pan-y pinch-zoom; /* 允许垂直滚动和缩放 */
+  }
+
+  /* 移动端优化滚动条样式 */
+  @media (max-width: 768px) {
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(var(--text-secondary-rgb), 0.1);
+      border: 1px solid transparent;
+    }
+  }
+
+  ::selection {
+    background: rgba(var(--purple-rgb), 0.2);
+    color: currentColor;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--text-secondary-rgb), 0.2);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--text-secondary-rgb), 0.3);
+  }
+}
+
+@layer components {
+  .nav-link {
+    position: relative;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: rgba(var(--purple-rgb), 0.2);
+  }
+
+  .nav-link.active {
+    color: rgba(var(--purple-rgb), 0.3);
+  }
+}
