@@ -25,6 +25,7 @@ import { SKU } from '@/collections/InternalManagement/Products/SKU'
 import { Posts } from '@/collections/ContentManagement/Posts'
 import { Nav } from './nav/config'
 import { SerialNumbers } from '@/collections/InternalManagement/Products/SerialNumbers'
+import { Products } from '@/collections/Product/index'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -91,12 +92,31 @@ export default buildConfig({
     SKU,
     Posts,
     SerialNumbers,
+    Products,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Nav],
   plugins: [
     stripePlugin({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+      stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET as string,
+      sync: [
+        {
+          collection: 'products',
+          stripeResourceType: 'products',
+          stripeResourceTypeSingular: 'product',
+          fields: [
+            {
+              fieldPath: 'title',
+              stripeProperty: 'name',
+            },
+            {
+              fieldPath: 'pricing.price',
+              stripeProperty: 'metadata.price',
+            },
+          ],
+        },
+      ],
     }),
     nestedDocsPlugin({
       collections: ['pages'],

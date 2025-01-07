@@ -24,6 +24,7 @@ export interface Config {
     skus: Skus;
     posts: Post;
     'serial-numbers': SerialNumber;
+    products: Product;
     'custom-forms': CustomForm;
     'custom-submissions': CustomSubmission;
     redirects: Redirect;
@@ -55,6 +56,7 @@ export interface Config {
     skus: SkusSelect<false> | SkusSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'serial-numbers': SerialNumbersSelect<false> | SerialNumbersSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'custom-forms': CustomFormsSelect<false> | CustomFormsSelect<true>;
     'custom-submissions': CustomSubmissionsSelect<false> | CustomSubmissionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -1063,6 +1065,56 @@ export interface Resident {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  /**
+   * 选择产品发布批次
+   */
+  release: number | Release;
+  pricing: {
+    price: number;
+  };
+  content?: {
+    description?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    media?:
+      | {
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  categories?: (number | Category)[] | null;
+  releaseNumber?: string | null;
+  color?: string | null;
+  size?: string | null;
+  origin?: string | null;
+  status?: ('draft' | 'published' | 'archived') | null;
+  slug?: string | null;
+  stripeID?: string | null;
+  skipSync?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "custom-forms".
  */
 export interface CustomForm {
@@ -1413,6 +1465,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'serial-numbers';
         value: number | SerialNumber;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'custom-forms';
@@ -2025,6 +2081,42 @@ export interface SerialNumbersSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  release?: T;
+  pricing?:
+    | T
+    | {
+        price?: T;
+      };
+  content?:
+    | T
+    | {
+        description?: T;
+        media?:
+          | T
+          | {
+              image?: T;
+              id?: T;
+            };
+      };
+  categories?: T;
+  releaseNumber?: T;
+  color?: T;
+  size?: T;
+  origin?: T;
+  status?: T;
+  slug?: T;
+  stripeID?: T;
+  skipSync?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
