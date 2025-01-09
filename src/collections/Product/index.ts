@@ -7,7 +7,7 @@ export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'price', '_status'],
+    defaultColumns: ['title', 'pricing.finalPrice', '_status'],
     group: 'Shop',
   },
   access: {
@@ -20,4 +20,14 @@ export const Products: CollectionConfig = {
     drafts: true,
   },
   fields: productFields,
+  hooks: {
+    beforeChange: [
+      async ({ data }) => {
+        if (data.pricing?.finalPrice) {
+          data.stripeProductPrice = data.pricing.finalPrice * 100
+        }
+        return data
+      },
+    ],
+  },
 }

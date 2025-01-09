@@ -2,14 +2,14 @@ import { generateSerials } from '@/hooks/generateSerials'
 import { CollectionConfig } from 'payload'
 import { headArchitectAccess, architectAccess } from '@/access/architects'
 import { anyone } from '@/access/anyone'
+import { STATUS } from './SerialNumbers'
+
+const AVAILABLE_STATUSES = [STATUS.CREATED, STATUS.IN_WAREHOUSE, STATUS.IN_STORE] as const
 
 export type SKU = {
   id: string
   sku: string
-  hasSerials: boolean
-  generateSerials: boolean
   quantity: number
-  // ... 其他必要字段
 }
 
 export const SKU: CollectionConfig = {
@@ -26,7 +26,7 @@ export const SKU: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'sku',
-    defaultColumns: ['sku', 'release', 'prototype', 'color', 'size', 'quantity'],
+    defaultColumns: ['sku', 'release', 'color', 'size', 'quantity', 'stockStatus'],
     group: {
       en: 'Internal Management - Products',
       zh: '内部管理 - 产品',
@@ -108,9 +108,54 @@ export const SKU: CollectionConfig = {
         },
       },
     },
+    {
+      name: 'stockStatus',
+      type: 'select',
+      options: [
+        { label: '有货', value: 'in_stock' },
+        { label: '无货', value: 'out_of_stock' },
+      ],
+      label: {
+        en: 'Stock Status',
+        zh: '库存状态',
+      },
+      admin: {
+        readOnly: true,
+      },
+    },
   ],
   hooks: {
     afterChange: [generateSerials],
+    afterRead: [
+      async ({ doc, req, context }) => {
+        if (context?.skipStockCheck || !doc?.id) return doc
+
+        try {
+          const serials = await req.payload.find({
+            collection: 'serial-numbers',
+            where: {
+              sku: {
+                equals: doc.id,
+              },
+              status: {
+                in: AVAILABLE_STATUSES,
+              },
+            },
+            depth: 0,
+            context: {
+              skipStockCheck: true,
+            },
+          })
+
+          doc.stockStatus = serials.totalDocs > 0 ? 'in_stock' : 'out_of_stock'
+          return doc
+        } catch (error) {
+          console.error('Failed to check stock status:', error)
+          doc.stockStatus = 'out_of_stock'
+          return doc
+        }
+      },
+    ],
   },
   access: {
     create: ({ req }) => {

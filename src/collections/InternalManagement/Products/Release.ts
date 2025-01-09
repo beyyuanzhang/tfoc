@@ -122,11 +122,32 @@ export const Release: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'hasSkus',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        readOnly: true,
+        hidden: true,
+      },
+    },
+    {
       name: 'sizes',
       type: 'relationship',
       relationTo: 'tags',
       hasMany: true,
       required: true,
+      access: {
+        update: ({ doc }) => {
+          if (doc?.sizes?.length > 0) return false
+          return true
+        },
+      },
+      admin: {
+        description: {
+          en: 'Cannot be modified once set',
+          zh: '设置后无法修改',
+        },
+      },
       label: {
         en: 'Sizes',
         zh: '尺码',
@@ -144,6 +165,18 @@ export const Release: CollectionConfig = {
       relationTo: 'tags',
       hasMany: true,
       required: true,
+      access: {
+        update: ({ doc }) => {
+          if (doc?.colors?.length > 0) return false
+          return true
+        },
+      },
+      admin: {
+        description: {
+          en: 'Cannot be modified once set',
+          zh: '设置后无法修改',
+        },
+      },
       label: {
         en: 'Colors',
         zh: '颜色',
@@ -309,126 +342,6 @@ export const Release: CollectionConfig = {
         },
         condition: (data) => data.discountStatus === 'discounted',
       },
-    },
-    {
-      name: 'colorMedia',
-      type: 'array',
-      label: {
-        en: 'Media File Per Color',
-        zh: '每个颜色对应的媒体文件',
-      },
-      admin: {
-        description: {
-          en: 'Upload media for each color',
-          zh: '上传每个颜色的媒体文件',
-        },
-      },
-      fields: [
-        {
-          name: 'color',
-          type: 'relationship',
-          relationTo: 'tags',
-          required: true,
-          label: {
-            en: 'Color',
-            zh: '颜色',
-          },
-          filterOptions: {
-            type: {
-              equals: TAG_TYPES.COLOR,
-            },
-          },
-        },
-        {
-          name: 'media',
-          type: 'array',
-          label: {
-            en: 'Media',
-            zh: '媒体',
-          },
-          fields: [
-            {
-              name: 'file',
-              type: 'upload',
-              relationTo: 'media',
-              required: true,
-              label: {
-                en: 'File',
-                zh: '文件',
-              },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'measurements',
-      type: 'array',
-      label: {
-        en: 'Size Measurements',
-        zh: '尺码测量',
-      },
-      admin: {
-        description: {
-          en: 'Add measurements for each size',
-          zh: '添加每个尺码的测量数据',
-        },
-      },
-      fields: [
-        {
-          name: 'size',
-          type: 'relationship',
-          relationTo: 'tags',
-          required: true,
-          label: {
-            en: 'Size',
-            zh: '尺码',
-          },
-          filterOptions: {
-            type: {
-              equals: TAG_TYPES.SIZE,
-            },
-          },
-        },
-        {
-          name: 'values',
-          type: 'array',
-          label: {
-            en: 'Measurement Values',
-            zh: '测量值',
-          },
-          fields: [
-            {
-              name: 'measurement',
-              type: 'relationship',
-              relationTo: 'tags',
-              required: true,
-              label: {
-                en: 'Measurement',
-                zh: '测量项',
-              },
-              filterOptions: {
-                type: {
-                  equals: TAG_TYPES.MEASUREMENT,
-                },
-              },
-            },
-            {
-              name: 'value',
-              type: 'number',
-              required: true,
-              min: 0,
-              label: {
-                en: 'Value',
-                zh: '数值',
-              },
-              admin: {
-                step: 0.1,
-              },
-            },
-          ],
-        },
-      ],
     },
     {
       type: 'tabs',
@@ -1070,22 +983,6 @@ export const Release: CollectionConfig = {
         description: {
           en: 'All SKUs for this Release',
           zh: '该 Release 所有 SKUs',
-        },
-      },
-    },
-    {
-      name: 'generateSkus',
-      type: 'checkbox',
-      label: {
-        en: 'Generate SKUs',
-        zh: '生成 SKUs',
-      },
-      defaultValue: false,
-      admin: {
-        position: 'sidebar',
-        description: {
-          en: 'Check and save to generate SKUs for this Release',
-          zh: '勾选并保存以生成该 Release 的所有 SKUs',
         },
       },
     },

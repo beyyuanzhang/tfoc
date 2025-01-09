@@ -42,6 +42,9 @@ export interface Config {
     skus: {
       serials: 'serial-numbers';
     };
+    products: {
+      skus: 'skus';
+    };
   };
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -807,7 +810,14 @@ export interface Release {
    * Enter production quantity
    */
   volume: number;
+  hasSkus?: boolean | null;
+  /**
+   * Cannot be modified once set
+   */
   sizes: (number | Tag)[];
+  /**
+   * Cannot be modified once set
+   */
   colors: (number | Tag)[];
   materials?:
     | {
@@ -830,37 +840,6 @@ export interface Release {
    * Enter discount rate (e.g., 80 means 20% off)
    */
   customDiscountRate?: number | null;
-  /**
-   * Upload media for each color
-   */
-  colorMedia?:
-    | {
-        color: number | Tag;
-        media?:
-          | {
-              file: number | Media;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Add measurements for each size
-   */
-  measurements?:
-    | {
-        size: number | Tag;
-        values?:
-          | {
-              measurement: number | Tag;
-              value: number;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
   costs?: {
     development?: {
       pattern?: number | null;
@@ -957,10 +936,6 @@ export interface Release {
     docs?: (number | Skus)[] | null;
     hasNextPage?: boolean | null;
   } | null;
-  /**
-   * Check and save to generate SKUs for this Release
-   */
-  generateSkus?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -982,6 +957,7 @@ export interface Skus {
     docs?: (number | SerialNumber)[] | null;
     hasNextPage?: boolean | null;
   } | null;
+  stockStatus?: ('in_stock' | 'out_of_stock') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -991,9 +967,6 @@ export interface Skus {
  */
 export interface SerialNumber {
   id: number;
-  /**
-   * Auto-generated serial number
-   */
   code: string;
   sku: number | Skus;
   status:
@@ -1074,11 +1047,57 @@ export interface Product {
    * 选择产品发布批次
    */
   release: number | Release;
+  /**
+   * Detailed product description
+   */
+  description?: string | null;
   pricing: {
-    price: number;
+    /**
+     * Suggested Retail Price (CNY)
+     */
+    suggestedPrice?: number | null;
+    /**
+     * Actual Base Price (CNY)
+     */
+    basePrice: number;
+    discountStatus?: ('normal' | 'discounted') | null;
+    /**
+     * 输入折扣率（例：80 表示 8折）
+     */
+    discountRate?: number | null;
+    /**
+     * Final Price (CNY)
+     */
+    finalPrice?: number | null;
+    /**
+     * Regional Prices (Auto-calculated)
+     */
+    regionalPrices?:
+      | {
+          currency?: ('CNY' | 'EUR' | 'USD') | null;
+          amount?: number | null;
+          formatted?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
-  content?: {
-    description?: {
+  productInfo?: {
+    sizes?: (number | Tag)[] | null;
+    colors?: (number | Tag)[] | null;
+    materials?:
+      | {
+          material: number | Tag;
+          percentage: number;
+          id?: string | null;
+        }[]
+      | null;
+    origin?: (number | null) | Tag;
+  };
+  details?: {
+    /**
+     * Product care instructions
+     */
+    productCare?: {
       root: {
         type: string;
         children: {
@@ -1093,18 +1112,45 @@ export interface Product {
       };
       [k: string]: unknown;
     } | null;
-    media?:
+    /**
+     * Upload media for each color
+     */
+    colorMedia?:
       | {
-          image?: (number | null) | Media;
+          color?: (number | null) | Tag;
+          media?:
+            | {
+                file?: (number | null) | Media;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Add measurements for each size
+     */
+    measurements?:
+      | {
+          size?: (number | null) | Tag;
+          values?:
+            | {
+                measurement: number | Tag;
+                value: number;
+                id?: string | null;
+              }[]
+            | null;
           id?: string | null;
         }[]
       | null;
   };
-  categories?: (number | Category)[] | null;
-  releaseNumber?: string | null;
-  color?: string | null;
-  size?: string | null;
-  origin?: string | null;
+  /**
+   * All SKUs for this Release
+   */
+  skus?: {
+    docs?: (number | Skus)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
   status?: ('draft' | 'published' | 'archived') | null;
   slug?: string | null;
   stripeID?: string | null;
@@ -1863,6 +1909,7 @@ export interface ReleaseSelect<T extends boolean = true> {
   releaseNumber?: T;
   releaseDate?: T;
   volume?: T;
+  hasSkus?: T;
   sizes?: T;
   colors?: T;
   materials?:
@@ -1877,31 +1924,6 @@ export interface ReleaseSelect<T extends boolean = true> {
   finalRetailPrice?: T;
   discountStatus?: T;
   customDiscountRate?: T;
-  colorMedia?:
-    | T
-    | {
-        color?: T;
-        media?:
-          | T
-          | {
-              file?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  measurements?:
-    | T
-    | {
-        size?: T;
-        values?:
-          | T
-          | {
-              measurement?: T;
-              value?: T;
-              id?: T;
-            };
-        id?: T;
-      };
   costs?:
     | T
     | {
@@ -1985,7 +2007,6 @@ export interface ReleaseSelect<T extends boolean = true> {
             };
       };
   skus?: T;
-  generateSkus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2028,6 +2049,7 @@ export interface SkusSelect<T extends boolean = true> {
   size?: T;
   quantity?: T;
   serials?: T;
+  stockStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2089,27 +2111,69 @@ export interface SerialNumbersSelect<T extends boolean = true> {
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
   release?: T;
+  description?: T;
   pricing?:
     | T
     | {
-        price?: T;
-      };
-  content?:
-    | T
-    | {
-        description?: T;
-        media?:
+        suggestedPrice?: T;
+        basePrice?: T;
+        discountStatus?: T;
+        discountRate?: T;
+        finalPrice?: T;
+        regionalPrices?:
           | T
           | {
-              image?: T;
+              currency?: T;
+              amount?: T;
+              formatted?: T;
               id?: T;
             };
       };
-  categories?: T;
-  releaseNumber?: T;
-  color?: T;
-  size?: T;
-  origin?: T;
+  productInfo?:
+    | T
+    | {
+        sizes?: T;
+        colors?: T;
+        materials?:
+          | T
+          | {
+              material?: T;
+              percentage?: T;
+              id?: T;
+            };
+        origin?: T;
+      };
+  details?:
+    | T
+    | {
+        productCare?: T;
+        colorMedia?:
+          | T
+          | {
+              color?: T;
+              media?:
+                | T
+                | {
+                    file?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        measurements?:
+          | T
+          | {
+              size?: T;
+              values?:
+                | T
+                | {
+                    measurement?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  skus?: T;
   status?: T;
   slug?: T;
   stripeID?: T;

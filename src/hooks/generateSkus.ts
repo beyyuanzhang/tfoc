@@ -4,6 +4,22 @@ export const generateSkus: CollectionAfterChangeHook = async ({ doc, req, contex
   if (context?.skipGenerateSkus) return doc
 
   try {
+    // 检查是否已经有 SKUs
+    const existingSkus = await req.payload.find({
+      collection: 'skus',
+      where: {
+        release: {
+          equals: doc.id,
+        },
+      },
+      limit: 1,
+    })
+
+    if (existingSkus.totalDocs > 0) {
+      console.log('SKUs 已存在，跳过生成')
+      return doc
+    }
+
     const timerLabel = `生成 SKU 总用时-${Date.now()}`
     console.time(timerLabel)
 
@@ -59,6 +75,16 @@ export const generateSkus: CollectionAfterChangeHook = async ({ doc, req, contex
 
     // 等待所有 SKU 创建完成
     await Promise.all(createPromises)
+
+    // 设置 hasSkus 为 true
+    await req.payload.update({
+      collection: 'release',
+      id: doc.id,
+      data: {
+        hasSkus: true,
+      },
+      overrideAccess: true,
+    })
 
     console.timeEnd(timerLabel)
     return doc

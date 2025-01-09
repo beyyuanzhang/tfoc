@@ -2,6 +2,14 @@ import type { CollectionConfig } from 'payload'
 import { headArchitectAccess, architectAccess } from '@/access/architects'
 import { anyone } from '@/access/anyone'
 
+export const TAG_TYPES = {
+  COLOR: 'color',
+  SIZE: 'size',
+  MATERIAL: 'material',
+  ORIGIN: 'origin',
+  MEASUREMENT: 'measurement',
+} as const
+
 export const Tags: CollectionConfig = {
   slug: 'tags',
   labels: {

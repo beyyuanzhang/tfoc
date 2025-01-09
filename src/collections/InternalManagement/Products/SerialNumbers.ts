@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { createHash } from 'crypto'
 import { headArchitectAccess, architectAccess } from '@/access/architects'
 import { anyone } from '@/access/anyone'
 
@@ -49,8 +48,8 @@ export const SerialNumbers: CollectionConfig = {
     },
   },
   access: {
-    create: () => false,
-    delete: () => false,
+    create: () => false, // 通过 SKU 创建
+    delete: () => false, // 禁止删除
     read: anyone,
     update: ({ req }) => {
       return headArchitectAccess({ req }) || architectAccess({ req })
@@ -68,7 +67,6 @@ export const SerialNumbers: CollectionConfig = {
       },
       admin: {
         readOnly: true,
-        description: 'Auto-generated serial number',
       },
       access: {
         update: () => false, // 禁止修改
@@ -94,7 +92,7 @@ export const SerialNumbers: CollectionConfig = {
       options: Object.values(STATUS).map((value) => ({
         label: {
           en: value.replace(/_/g, ' ').toLowerCase(),
-          zh: value, // 需要添加中文翻译
+          zh: value,
         },
         value,
       })),
@@ -134,62 +132,41 @@ export const SerialNumbers: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, req, operation, originalDoc }) => {
+        // 系统操作检查
+        if (req.context?.skipGenerateSerials) return data
+
         // 验证不可修改字段
         if (operation === 'update') {
-          const allowedFields = ['status', 'statusNote']
-          const attemptedChanges = Object.keys(data)
+          const allowedFields = ['status', 'statusNote', 'statusHistory']
+          const systemFields = ['updatedAt', 'createdAt']
+
+          // 只检查非系统字段的变更
+          const attemptedChanges = Object.keys(data).filter(
+            (field) => !systemFields.includes(field) && data[field] !== originalDoc[field], // 只检查实际变更
+          )
 
           const hasInvalidChanges = attemptedChanges.some((field) => !allowedFields.includes(field))
 
           if (hasInvalidChanges) {
+            console.log('Invalid fields:', attemptedChanges)
             throw new Error('只能修改状态相关字段')
           }
-        }
 
-        // 生成序列号
-        if (operation === 'create') {
-          const payload = req.payload
-          const sku = await payload.findByID({
-            collection: 'skus',
-            id: data.sku,
-          })
+          // 记录状态变更
+          if (data.status !== originalDoc.status) {
+            if (!req.user) {
+              throw new Error('需要用户信息来更改状态')
+            }
 
-          if (!sku) {
-            throw new Error('Invalid SKU')
+            const history = originalDoc.statusHistory || []
+            history.push({
+              status: data.status,
+              timestamp: new Date(),
+              operator: req.user.email,
+              note: data.statusNote || '状态更新',
+            })
+            data.statusHistory = history
           }
-
-          const existingCount = await payload.find({
-            collection: 'serial-numbers',
-            where: {
-              sku: {
-                equals: data.sku,
-              },
-            },
-          })
-
-          const index = existingCount.totalDocs + 1
-          const timestamp = Date.now()
-          const hashInput = `${sku.sku}-${index}-${timestamp}`
-          const hash = createHash('md5').update(hashInput).digest('hex').slice(0, 4)
-
-          data.code = `${sku.sku}-${index.toString().padStart(3, '0')}-${hash}`
-          data.status = STATUS.CREATED
-        }
-
-        // 记录状态变更
-        if (operation === 'update' && data.status !== originalDoc.status) {
-          if (!req.user) {
-            throw new Error('需要用户信息来更改状态')
-          }
-
-          const history = originalDoc.statusHistory || []
-          history.push({
-            status: data.status,
-            timestamp: new Date(),
-            operator: req.user.email,
-            note: data.statusNote || '状态更新',
-          })
-          data.statusHistory = history
         }
 
         return data

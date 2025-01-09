@@ -111,8 +111,12 @@ export default buildConfig({
               stripeProperty: 'name',
             },
             {
-              fieldPath: 'pricing.price',
-              stripeProperty: 'metadata.price',
+              fieldPath: 'description',
+              stripeProperty: 'description',
+            },
+            {
+              fieldPath: 'pricing.finalPrice',
+              stripeProperty: 'default_price',
             },
           ],
         },
