@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import { STATUS } from '../collections/InternalManagement/Products/SerialNumbers'
+import { STATUS } from '../SerialNumbers'
 import { createHash } from 'crypto'
 
 export const generateSerials: CollectionAfterChangeHook = async ({ doc, req, context }) => {

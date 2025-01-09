@@ -1037,6 +1037,8 @@ export interface Resident {
   password?: string | null;
 }
 /**
+ * Manage all products in the shop
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
@@ -1044,13 +1046,16 @@ export interface Product {
   id: number;
   title: string;
   /**
-   * 选择产品发布批次
+   * Select product release batch
    */
   release: number | Release;
   /**
    * Detailed product description
    */
   description?: string | null;
+  /**
+   * Manage product pricing
+   */
   pricing: {
     /**
      * Suggested Retail Price (CNY)
@@ -1081,6 +1086,9 @@ export interface Product {
         }[]
       | null;
   };
+  /**
+   * Basic product information
+   */
   productInfo?: {
     sizes?: (number | Tag)[] | null;
     colors?: (number | Tag)[] | null;
@@ -1151,8 +1159,22 @@ export interface Product {
     docs?: (number | Skus)[] | null;
     hasNextPage?: boolean | null;
   } | null;
+  /**
+   * Product status
+   */
   status?: ('draft' | 'published' | 'archived') | null;
+  /**
+   * URL friendly version of the product name
+   */
   slug?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
   stripeID?: string | null;
   skipSync?: boolean | null;
   updatedAt: string;
@@ -2176,6 +2198,13 @@ export interface ProductsSelect<T extends boolean = true> {
   skus?: T;
   status?: T;
   slug?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
   stripeID?: T;
   skipSync?: T;
   updatedAt?: T;

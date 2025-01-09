@@ -1,4 +1,4 @@
-import { generateSerials } from '@/hooks/generateSerials'
+import { generateSerials } from '@/collections/InternalManagement/Products/hooks/generateSerials'
 import { CollectionConfig } from 'payload'
 import { headArchitectAccess, architectAccess } from '@/access/architects'
 import { anyone } from '@/access/anyone'

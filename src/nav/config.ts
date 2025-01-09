@@ -5,15 +5,15 @@ export const Nav: GlobalConfig = {
   slug: 'nav',
   label: {
     en: 'Navigation',
-    zh: '导航'
+    zh: '导航',
   },
   access: {
     read: () => true,
   },
   admin: {
     group: {
-      en: 'System',
-      zh: '系统'
+      en: 'Global',
+      zh: '全局',
     },
     description: '全局导航配置',
   },

@@ -71,7 +71,7 @@ export async function GET(
         limit: 1,
         // pagination: false reduces overhead if you don't need totalDocs
         pagination: false,
-        depth: 0,
+        depth: 2,
         select: {},
         where: {
           slug: {

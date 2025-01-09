@@ -1,11 +1,11 @@
 import type { CollectionConfig } from 'payload'
-import { calculatePricing } from '@/hooks/calculatePricing'
+import { calculatePricing } from '@/collections/InternalManagement/Products/hooks/calculatePricing'
 import {
   generateSubtitle,
   validateMaterialPercentages,
   handleFinalRetailPrice,
-} from '@/hooks/releaseManagement'
-import { generateSkus } from '@/hooks/generateSkus'
+} from '@/collections/InternalManagement/Products/hooks/releaseManagement'
+import { generateSkus } from '@/collections/InternalManagement/Products/hooks/generateSkus'
 import { headArchitectAccess, architectAccess } from '@/access/architects'
 import { anyone } from '@/access/anyone'
 

@@ -25,7 +25,7 @@ import { SKU } from '@/collections/InternalManagement/Products/SKU'
 import { Posts } from '@/collections/ContentManagement/Posts'
 import { Nav } from './nav/config'
 import { SerialNumbers } from '@/collections/InternalManagement/Products/SerialNumbers'
-import { Products } from '@/collections/Product/index'
+import { Products } from '@/collections/Shop/Product/index'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

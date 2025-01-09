@@ -6,14 +6,25 @@ export const productFields: Field[] = [
     name: 'title',
     type: 'text',
     required: true,
+    label: {
+      en: 'Product Title',
+      zh: '产品名称',
+    },
   },
   {
     name: 'release',
     type: 'relationship',
     relationTo: 'release',
     required: true,
+    label: {
+      en: 'Release',
+      zh: '发布批次',
+    },
     admin: {
-      description: '选择产品发布批次',
+      description: {
+        en: 'Select product release batch',
+        zh: '选择产品发布批次',
+      },
     },
     filterOptions: async ({ req }) => {
       // 1. 获取所有已经被关联的 release IDs
@@ -81,10 +92,20 @@ export const productFields: Field[] = [
     },
   },
 
-  // 价格管理 (保留更新后的版本)
+  // 价格管理
   {
     name: 'pricing',
     type: 'group',
+    label: {
+      en: 'Pricing',
+      zh: '价格管理',
+    },
+    admin: {
+      description: {
+        en: 'Manage product pricing',
+        zh: '管理产品价格信息',
+      },
+    },
     fields: [
       // 1. 建议售价 (从 release 同步)
       {
@@ -227,10 +248,20 @@ export const productFields: Field[] = [
     ],
   },
 
-  // 产品信息 (保留更新后的版本)
+  // 产品信息
   {
     name: 'productInfo',
     type: 'group',
+    label: {
+      en: 'Product Information',
+      zh: '产品信息',
+    },
+    admin: {
+      description: {
+        en: 'Basic product information',
+        zh: '基本产品信息',
+      },
+    },
     fields: [
       {
         name: 'sizes',
@@ -238,6 +269,10 @@ export const productFields: Field[] = [
         relationTo: 'tags',
         hasMany: true,
         admin: { readOnly: true },
+        label: {
+          en: 'Sizes',
+          zh: '尺码',
+        },
       },
       {
         name: 'colors',
@@ -245,10 +280,18 @@ export const productFields: Field[] = [
         relationTo: 'tags',
         hasMany: true,
         admin: { readOnly: true },
+        label: {
+          en: 'Colors',
+          zh: '颜色',
+        },
       },
       {
         name: 'materials',
         type: 'array',
+        label: {
+          en: 'Materials',
+          zh: '材料',
+        },
         fields: [
           {
             name: 'material',
@@ -256,6 +299,10 @@ export const productFields: Field[] = [
             relationTo: 'tags',
             required: true,
             admin: { readOnly: true },
+            label: {
+              en: 'Material',
+              zh: '材料',
+            },
             filterOptions: {
               type: {
                 equals: TAG_TYPES.MATERIAL,
@@ -269,6 +316,10 @@ export const productFields: Field[] = [
             max: 100,
             required: true,
             admin: { readOnly: true },
+            label: {
+              en: 'Percentage',
+              zh: '百分比',
+            },
           },
         ],
       },
@@ -277,6 +328,10 @@ export const productFields: Field[] = [
         type: 'relationship',
         relationTo: 'tags',
         admin: { readOnly: true },
+        label: {
+          en: 'Origin',
+          zh: '产地',
+        },
       },
     ],
   },
@@ -438,13 +493,30 @@ export const productFields: Field[] = [
     name: 'status',
     type: 'select',
     options: [
-      { label: '草稿', value: 'draft' },
-      { label: '已发布', value: 'published' },
-      { label: '已下架', value: 'archived' },
+      {
+        label: { en: 'Draft', zh: '草稿' },
+        value: 'draft',
+      },
+      {
+        label: { en: 'Published', zh: '已发布' },
+        value: 'published',
+      },
+      {
+        label: { en: 'Archived', zh: '已下架' },
+        value: 'archived',
+      },
     ],
     defaultValue: 'draft',
     admin: {
       position: 'sidebar',
+      description: {
+        en: 'Product status',
+        zh: '产品状态',
+      },
+    },
+    label: {
+      en: 'Status',
+      zh: '状态',
     },
   },
 
@@ -454,6 +526,14 @@ export const productFields: Field[] = [
     type: 'text',
     admin: {
       position: 'sidebar',
+      description: {
+        en: 'URL friendly version of the product name',
+        zh: 'URL 友好的产品名称',
+      },
+    },
+    label: {
+      en: 'URL Slug',
+      zh: 'URL 别名',
     },
     hooks: {
       beforeValidate: [
