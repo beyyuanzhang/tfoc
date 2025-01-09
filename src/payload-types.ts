@@ -1037,8 +1037,6 @@ export interface Resident {
   password?: string | null;
 }
 /**
- * Manage all products in the shop
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
@@ -1167,7 +1165,7 @@ export interface Product {
    * URL friendly version of the product name
    */
   slug?: string | null;
-  meta?: {
+  seo?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
@@ -2198,7 +2196,7 @@ export interface ProductsSelect<T extends boolean = true> {
   skus?: T;
   status?: T;
   slug?: T;
-  meta?:
+  seo?:
     | T
     | {
         title?: T;

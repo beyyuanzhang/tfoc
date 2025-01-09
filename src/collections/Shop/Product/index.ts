@@ -22,10 +22,6 @@ export const Products: CollectionConfig = {
       en: 'Shop',
       zh: '商城',
     },
-    description: {
-      en: 'Manage all products in the shop',
-      zh: '管理商城中的所有产品',
-    },
     livePreview: {
       url: ({ data, req }) => {
         const path = generatePreviewPath({
@@ -68,13 +64,22 @@ export const Products: CollectionConfig = {
     maxPerDoc: 50,
   },
   fields: [
-    ...productFields,
     {
       type: 'tabs',
       tabs: [
         {
-          name: 'meta',
-          label: 'SEO',
+          label: {
+            en: 'Product',
+            zh: '产品'
+          },
+          fields: productFields
+        },
+        {
+          name: 'seo',
+          label: {
+            en: 'SEO',
+            zh: 'SEO'
+          },
           fields: [
             OverviewField({
               titlePath: 'meta.title',
