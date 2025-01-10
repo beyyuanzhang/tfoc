@@ -10,16 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { LinearLogo } from '@/components/icons/LinearLogo'
 import type { NavData } from './types'
-
-const dropUpVariants = {
-  hidden: { opacity: 0, filter: 'blur(10px)' },
-  visible: {
-    opacity: 1,
-    filter: 'blur(0px)',
-    transition: { duration: 0.5, ease: 'easeInOut' },
-  },
-  exit: { opacity: 0, filter: 'blur(10px)', transition: { duration: 0.5, ease: 'easeInOut' } },
-}
+import { navVariants } from '@/app/(frontend)/lib/motion/variants'
 
 interface NavClientProps {
   data: NavData
@@ -33,7 +24,7 @@ export const NavClient: React.FC<NavClientProps> = ({ data }) => {
   )
 }
 
-const NavContent: React.FC<NavClientProps> = ({ data }) => {
+export const NavContent: React.FC<NavClientProps> = ({ data }) => {
   const { appearance, leftNavItems, portalRows } = data
   const [isPortalOpen, setIsPortalOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
@@ -160,15 +151,15 @@ const NavContent: React.FC<NavClientProps> = ({ data }) => {
           </div>
         </nav>
 
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isPortalOpen && (
             <motion.div
               id="nav-portal"
               role="navigation"
               aria-label="Portal navigation"
-              variants={dropUpVariants}
-              initial="hidden"
-              animate="visible"
+              variants={navVariants.portal}
+              initial="initial"
+              animate="animate"
               exit="exit"
               className="absolute bottom-full left-0 mb-[0.5vh] w-full"
               style={{
@@ -179,15 +170,21 @@ const NavContent: React.FC<NavClientProps> = ({ data }) => {
               onMouseLeave={() => setIsPortalOpen(false)}
             >
               <div className="container mx-auto p-[1vh] flex flex-col items-end gap-[6vh]">
-                <Link
-                  href="/"
-                  className="block w-[40vw] sm:w-[35vw] md:w-[32vw] lg:w-[28vw] xl:w-[25vw] transition-colors hover:text-[#7370B2]"
+                <motion.div
+                  variants={navVariants.item}
+                  className="w-[40vw] sm:w-[35vw] md:w-[32vw] lg:w-[28vw] xl:w-[25vw]"
                 >
-                  <LinearLogo className="w-full h-auto" style={{ color: appearance.textColor }} />
-                </Link>
+                  <Link href="/" className="block transition-colors hover:text-[#7370B2]">
+                    <LinearLogo className="w-full h-auto" style={{ color: appearance.textColor }} />
+                  </Link>
+                </motion.div>
 
                 {portalRows.map((row, rowIndex) => (
-                  <div key={rowIndex} className="flex flex-col gap-[0.6vh] items-end">
+                  <motion.div
+                    key={rowIndex}
+                    variants={navVariants.item}
+                    className="flex flex-col gap-[0.6vh] items-end"
+                  >
                     {row.items.map((item) => (
                       <Link
                         key={item.title}
@@ -200,10 +197,13 @@ const NavContent: React.FC<NavClientProps> = ({ data }) => {
                         {item.title}
                       </Link>
                     ))}
-                  </div>
+                  </motion.div>
                 ))}
 
-                <div className="flex flex-col gap-[0.5vh] lg:hidden">
+                <motion.div
+                  variants={navVariants.item}
+                  className="flex flex-col gap-[0.5vh] lg:hidden"
+                >
                   {leftNavItems.map((item) => (
                     <Link
                       key={item.title}
@@ -213,7 +213,7 @@ const NavContent: React.FC<NavClientProps> = ({ data }) => {
                       {item.title}
                     </Link>
                   ))}
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           )}

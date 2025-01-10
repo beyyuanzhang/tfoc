@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+import typography from '@tailwindcss/typography'
+import animate from 'tailwindcss-animate'
+
+const config = {
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -7,7 +9,7 @@ export default {
     './src/**/*.{ts,tsx}',
   ],
   darkMode: ['selector', '[data-theme="dark"]'],
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  plugins: [animate, typography],
   prefix: '',
   safelist: [
     'lg:col-span-4',
@@ -104,7 +106,7 @@ export default {
           to: { height: '0' },
         },
       },
-      typography: ({ theme }) => ({
+      typography: {
         DEFAULT: {
           css: [
             {
@@ -142,7 +144,9 @@ export default {
             },
           ],
         },
-      }),
+      },
     },
   },
 }
+
+export default config
