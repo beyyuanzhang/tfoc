@@ -35,7 +35,6 @@ export default async function ProductPage({ params: paramsPromise }: Args) {
     </>
   )
 }
-
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
@@ -70,18 +69,6 @@ const queryProductBySlug = cache(async ({ slug }: { slug: string }) => {
       },
     },
     draft,
-    select: {
-      title: true,
-      slug: true,
-      _status: true,
-      pricing: {
-        finalPrice: true,
-      },
-      details: {
-        colorMedia: true,
-      },
-      meta: true,
-    },
   })
 
   return result.docs?.[0] || null

@@ -164,6 +164,9 @@ export const MediaCarousel: React.FC<MediaCarouselProps> = ({
   const toggleMute = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     setIsMuted((prev) => !prev)
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted
+    }
   }, [])
 
   if (isLoading) {
@@ -186,31 +189,6 @@ export const MediaCarousel: React.FC<MediaCarouselProps> = ({
           'aspect-square relative cursor-pointer overflow-hidden',
           'bg-[#FCFCFC]',
         )}
-        onClick={togglePlayPause}
-        style={{
-          boxShadow: `
-            /* 主要凹陷阴影 - 深度感 */
-            inset 0 12px 24px -6px rgba(0,0,0,0.12),
-            inset 0 8px 16px -4px rgba(0,0,0,0.08),
-            
-            /* 精确边缘阴影 - 机械感 */
-            inset 0 2px 4px -1px rgba(0,0,0,0.06),
-            inset 0 1px 2px -1px rgba(0,0,0,0.04),
-            
-            /* 顶部压力阴影 - 嵌入感 */
-            inset 0 16px 32px -12px rgba(0,0,0,0.14),
-            
-            /* 底部反光 - 金属感 */
-            inset 0 -6px 12px -4px rgba(255,255,255,0.1),
-            
-            /* 精确边框 - 工业感 */
-            0 0 0 1px rgba(0,0,0,0.05),
-            
-            /* 外部光晕 - 建筑感 */
-            0 -1px 3px -1px rgba(255,255,255,0.15),
-            0 1px 3px -1px rgba(0,0,0,0.1)
-          `,
-        }}
       >
         {currentItem?.type === 'image' && (
           <Image
@@ -236,21 +214,52 @@ export const MediaCarousel: React.FC<MediaCarouselProps> = ({
           />
         )}
 
+        <div
+          className="absolute inset-0 pointer-events-none z-[1]"
+          style={{
+            boxShadow: `
+              inset 0 12px 24px -6px rgba(0,0,0,0.12),
+              inset 0 8px 16px -4px rgba(0,0,0,0.08),
+              inset 0 2px 4px -1px rgba(0,0,0,0.06),
+              inset 0 1px 2px -1px rgba(0,0,0,0.04),
+              inset 0 16px 32px -12px rgba(0,0,0,0.14),
+              inset 0 -6px 12px -4px rgba(255,255,255,0.1)
+            `,
+          }}
+        />
+
+        <div
+          className="absolute inset-0 pointer-events-none z-[2]"
+          style={{
+            boxShadow: `
+              0 0 0 1px rgba(0,0,0,0.05),
+              0 -1px 3px -1px rgba(255,255,255,0.15),
+              0 1px 3px -1px rgba(0,0,0,0.1)
+            `,
+          }}
+        />
+
         {currentItem?.type === 'text' && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center z-[3]">
             <p className="max-w-[80%] text-base font-medium text-black text-center leading-relaxed">
               {currentItem.content}
             </p>
           </div>
         )}
 
-        {(!currentItem || !mediaLoaded) && <LogoDisplay />}
+        {(!currentItem || !mediaLoaded) && (
+          <div className="absolute inset-0 z-[3]">
+            <LogoDisplay />
+          </div>
+        )}
 
         {currentItem?.type === 'video' && mediaLoaded && (
-          <div className="absolute bottom-2 right-2 z-10">
+          <div className="absolute bottom-2 right-2 z-[4]">
             <VolumeControl isMuted={isMuted} onToggle={toggleMute} />
           </div>
         )}
+
+        <div className="absolute inset-0 z-[3]" onClick={togglePlayPause} />
       </div>
     </div>
   )

@@ -44,7 +44,7 @@ export const NavContent: React.FC<NavClientProps> = ({ data }) => {
         style={{
           backgroundColor: appearance.backgroundColor,
           color: appearance.textColor,
-          height: '3.7vh',
+          height: '3.5vh',
         }}
       >
         <nav
